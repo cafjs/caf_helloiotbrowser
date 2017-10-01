@@ -1,0 +1,19 @@
+{
+    "name": "caf_iot_helloiotbrowser",
+    "description": "Cloud Assistants IoT example (Device)",
+    "version": "0.2.1",
+    "author": "Antonio Lain <antlai@cafjs.com>",
+    "dependencies": {
+        "caf_iot" : "^0.2.0",
+        "caf_iot_gatt" : "^0.2.0"
+    },
+    "browser" : {
+        "./lib/main.js" : "./lib/main-shim.js"
+    },
+    "scripts": {
+        "start" : "node ./index.js",
+        "build": "echo done"
+    },
+    "main": "index",
+    "engines": { "node": ">= 0.10.29" }
+}
