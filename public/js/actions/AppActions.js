@@ -73,7 +73,7 @@ var AppActions = {
     }
 };
 
-['findServices', 'selectDevice', 'blink', 'getState',
+['findServices', 'selectDevice', 'blink', 'getState', 'stop',
  'disconnect'].forEach(function(x) {
      AppActions[x] = function() {
          var args = Array.prototype.slice.call(arguments);

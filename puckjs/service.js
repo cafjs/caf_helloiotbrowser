@@ -67,4 +67,7 @@ setInterval(function() {
             }
         }
     });
+    NRF.setAdvertising({
+        0xBCDE: [counter]
+    }, {interval:500, name: 'White'});
 }, 2000);

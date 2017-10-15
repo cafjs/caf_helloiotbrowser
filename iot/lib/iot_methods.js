@@ -161,6 +161,15 @@ exports.methods = {
         cb(null);
     },
 
+    stop: function(cb) {
+        var buf = new Buffer('off');
+        if (this.scratch.blinkCharact) {
+            this.$.log && this.$.log.debug('Stop advertising');
+            this.$.gatt.write(this.scratch.blinkCharact, buf);
+        }
+        cb(null);
+    },
+
     disconnect: function(cb) {
         if (this.scratch.notifyCharact) {
             this.$.gatt.unsubscribe(this.scratch.notifyCharact);

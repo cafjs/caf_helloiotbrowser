@@ -9,6 +9,10 @@ var Device = {
         AppActions.blink(this.props.ctx);
     },
 
+    doStop: function() {
+        AppActions.stop(this.props.ctx);
+    },
+
     doDisconnect: function() {
         AppActions.disconnect(this.props.ctx);
     },
@@ -26,24 +30,31 @@ var Device = {
                              placeholder: 'No device'
                          })
                         ),
-                      cE(rB.Col, {sm:3, xs:6},
+                      cE(rB.Col, {sm:2, xs:3},
                          cE(rB.Button, {
                              className: 'lowerInRow',
                              bsStyle: 'primary',
                              onClick: this.doBlink
                          }, "Blink")
                         ),
-                     cE(rB.Col, {sm:3, xs:6},
-                        cE(rB.Input, {
-                            label: 'Sensor Value',
-                            type: 'text',
-                            ref: 'sensorValue',
-                            readOnly: true,
-                            value: this.props.sensorValue,
-                            placeholder: 'No data'
-                        })
-                       ),
+                      cE(rB.Col, {sm:2, xs:3},
+                         cE(rB.Button, {
+                             className: 'lowerInRow',
+                             bsStyle: 'danger',
+                             onClick: this.doStop
+                         }, "Stop")
+                        ),
                       cE(rB.Col, {sm:3, xs:6},
+                         cE(rB.Input, {
+                             label: 'Sensor Value',
+                             type: 'text',
+                             ref: 'sensorValue',
+                             readOnly: true,
+                             value: this.props.sensorValue,
+                             placeholder: 'No data'
+                         })
+                        ),
+                      cE(rB.Col, {sm:2, xs:3},
                          cE(rB.Button, {
                              className: 'lowerInRow',
                              bsStyle: 'danger',
