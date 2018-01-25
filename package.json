@@ -1,34 +1,37 @@
 {
-  "name": "caf_helloiotbrowser",
-  "description": "Cloud Assistants with Web Bluetooth basic example",
-  "version": "0.2.21",
-  "author": "Antonio Lain <antlai@cafjs.com>",
-  "dependencies": {
-      "caf_react" :"^0.2.0",
-      "caf_core": "^0.2.0",
-      "caf_transport" : "^0.2.0",
-      "caf_cli": "^0.2.0",
-      "caf_iot": "^0.2.0",
-      "caf_iot_gatt": "^0.2.0",
-      "react" : "^0.14.0",
-      "react-dom" : "^0.14.0",
-      "react-bootstrap" : "^0.28.1",
-      "redux": "^3.5.0",
-      "keymirror": "^0.1.0",
-      "object-assign" : "^4.1.0"
-  },
+    "name": "caf_helloiotbrowser",
+    "description": "Cloud Assistants with Web Bluetooth basic example",
+    "version": "0.3.0",
+    "author": "Antonio Lain <antlai@cafjs.com>",
+    "dependencies": {
+        "caf_cli": "^0.3.0",
+        "caf_core": "^0.3.0",
+        "caf_iot": "^0.3.0",
+        "caf_iot_gatt": "^0.3.0",
+        "caf_react": "^0.3.0",
+        "caf_transport": "^0.3.0",
+        "espruino": "0.0.36",
+        "keymirror": "^0.1.0",
+        "object-assign": "^4.1.0",
+        "react": "^0.14.0",
+        "react-bootstrap": "^0.28.1",
+        "react-dom": "^0.14.0",
+        "redux": "^3.5.0"
+    },
     "devDependencies": {
-        "caf_dcinabox" :"^0.2.0",
-        "nodeunit" : ">=0.9",
-        "browserify" : "^13.0.0",
-        "uglify-js" : "^2.4.0"
+        "caf_dcinabox": "^0.3.0",
+        "nodeunit": ">=0.9",
+        "browserify": "^13.0.0",
+        "uglify-es": "^3.3.8"
     },
     "scripts": {
-       "start" : "node ./index.js",
+        "start": "node ./index.js",
         "test": "node ./node_modules/.bin/nodeunit",
         "build": "./bin/build.sh",
         "buildStatic": "cd iot; cafjs mkStatic"
     },
-   "main": "index",
-  "engines": { "node": ">= 0.10.29" }
+    "main": "index",
+    "engines": {
+        "node": ">= 8.0.0"
+    }
 }

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-"use strict";
+'use strict';
 
 var myUtils = require('caf_iot').caf_components.myUtils;
 
@@ -32,7 +32,7 @@ exports.methods = {
                                        (this.$.cloud.cli &&
                                         this.$.cloud.cli
                                         .getEstimatedTimeOffset()));
-        this.state.index = this.state.index  + 1;
+        this.state.index = this.state.index + 1;
         var now = (new Date()).getTime();
         this.$.log && this.$.log.debug(now + ' loop:' + this.state.index);
 
@@ -61,14 +61,14 @@ exports.methods = {
                       Click to allow Bluetooth scan</button>
              */
 
-            var button =  document.getElementById('confirmScan');
-            button.style = "display:inline;";
+            var button = document.getElementById('confirmScan');
+            button.style = 'display:inline;';
             button.addEventListener('click', function handler() {
 
                 self.$.gatt.findServices(config.service,
                                          '__iot_foundService__');
                 this.removeEventListener('click', handler);
-                button.style = "display:none;";
+                button.style = 'display:none;';
                 cb(null);
             });
         } else {
@@ -81,7 +81,7 @@ exports.methods = {
     __iot_foundService__: function(serviceId, device, cb) {
         var self = this;
         var filterF = function() {
-            var all =  self.scratch.devices || {};
+            var all = self.scratch.devices || {};
             var result = {};
             Object.keys(all).forEach(function(x) {
                 result[x] = {

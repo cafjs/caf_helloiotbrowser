@@ -9,15 +9,7 @@ unset NODE_ENV
 
 #build iot
 pushd iot
-if test -f all.tgz; then
-    tar xvf all.tgz
-fi
-rm -f *.tgz
-rm -f npm-shrinkwrap.json
-npm install --production
-npm shrinkwrap
-npm pack
-cp *.tgz ../public/iot.tgz
+cafjs pack true . ./app.tgz &&  mv ./app.tgz ../public/iot.tgz
 
 # browserify iot
 cafjs mkStatic
