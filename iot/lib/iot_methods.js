@@ -19,15 +19,15 @@ limitations under the License.
 var myUtils = require('caf_iot').caf_components.myUtils;
 
 exports.methods = {
-    __iot_setup__: function(cb) {
+    async __iot_setup__() {
         this.state.index = 0;
         this.scratch.devices = {};
         this.state.deviceInfo = {};
         this.state.sensorValue = null;
-        cb(null);
+        return [];
     },
 
-    __iot_loop__: function(cb) {
+    async __iot_loop__() {
         this.$.log && this.$.log.debug('Time offset ' +
                                        (this.$.cloud.cli &&
                                         this.$.cloud.cli
@@ -44,10 +44,10 @@ exports.methods = {
             this.toCloud.set('sensorValue', this.state.sensorValue);
         }
 
-        cb(null);
+        return [];
     },
 
-    findServices: function(config, cb) {
+    findServices(config, cb) {
         var self = this;
         var now = (new Date()).getTime();
         this.$.log && this.$.log.debug(now + ' config:' +
@@ -78,7 +78,7 @@ exports.methods = {
 
     },
 
-    __iot_foundService__: function(serviceId, device, cb) {
+    async __iot_foundService__(serviceId, device) {
         var self = this;
         var filterF = function() {
             var all = self.scratch.devices || {};
@@ -100,10 +100,10 @@ exports.methods = {
                                            serviceId + ' as opposed to ' +
                                            this.state.config.service);
         }
-        cb(null);
+        return [];
     },
 
-    selectDevice: function(deviceId, cb) {
+    async selectDevice(deviceId) {
         this.$.log && this.$.log.debug('Selected device ' + deviceId);
         this.state.selectedDevice = deviceId;
         if (this.scratch.devices[deviceId]) {
@@ -114,10 +114,10 @@ exports.methods = {
             this.$.log && this.$.log.debug('select: Ignoring unknown device ' +
                                            deviceId);
         }
-        cb(null);
+        return [];
     },
 
-    __iot_foundCharact__: function(service, device, chArray, cb) {
+    async __iot_foundCharact__(service, device, chArray) {
         var compare = function(x, y) {
             if (x.length < y.length) {
                 return compare(y, x);
@@ -141,36 +141,35 @@ exports.methods = {
                                                x.uuid);
             }
         });
-
-        cb(null);
+        return [];
     },
 
-    __iot_subscribe__: function(charact, value, cb) {
+    async __iot_subscribe__(charact, value) {
         value = parseInt(value.toString('hex'), 16);
         this.$.log && this.$.log.debug('Notify: got ' + value);
         this.state.sensorValue = value;
-        cb(null);
+        return [];
     },
 
-    blink: function(cb) {
+    async blink() {
         var buf = new Buffer('on');
         if (this.scratch.blinkCharact) {
             this.$.log && this.$.log.debug('Blinking');
             this.$.gatt.write(this.scratch.blinkCharact, buf);
         }
-        cb(null);
+        return [];
     },
 
-    stop: function(cb) {
+    async stop() {
         var buf = new Buffer('off');
         if (this.scratch.blinkCharact) {
             this.$.log && this.$.log.debug('Stop advertising');
             this.$.gatt.write(this.scratch.blinkCharact, buf);
         }
-        cb(null);
+        return [];
     },
 
-    disconnect: function(cb) {
+    async disconnect() {
         if (this.scratch.notifyCharact) {
             this.$.gatt.unsubscribe(this.scratch.notifyCharact);
         }
@@ -179,6 +178,6 @@ exports.methods = {
         if (device) {
             this.$.gatt.disconnect(device);
         }
-        cb(null);
+        return [];
     }
 };

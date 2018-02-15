@@ -75,17 +75,15 @@ var AppActions = {
 
 ['findServices', 'selectDevice', 'blink', 'getState', 'stop',
  'disconnect'].forEach(function(x) {
-     AppActions[x] = function() {
+     AppActions[x] = async function() {
          var args = Array.prototype.slice.call(arguments);
-         var ctx = args.shift();
-         args.push(function(err, data) {
-             if (err) {
-                 errorF(ctx.store, err);
-             } else {
-                 updateF(ctx.store, data);
-             }
-         });
-         ctx.session[x].apply(ctx.session, args);
+         try {
+             var ctx = args.shift();
+             var data = await ctx.session[x].apply(ctx.session, args);
+             updateF(ctx.store, data);
+         } catch (err) {
+             errorF(ctx.store, err);
+         }
      };
  });
 
