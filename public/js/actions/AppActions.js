@@ -79,7 +79,8 @@ var AppActions = {
          var args = Array.prototype.slice.call(arguments);
          try {
              var ctx = args.shift();
-             var data = await ctx.session[x].apply(ctx.session, args);
+             var data = await ctx.session[x].apply(ctx.session, args)
+                     .getPromise();
              updateF(ctx.store, data);
          } catch (err) {
              errorF(ctx.store, err);
