@@ -4,9 +4,7 @@ var redux = require('redux');
 
 var AppReducer = function(state, action) {
     if (typeof state === 'undefined') {
-        return  {sensorValue: null, newURL: null,
-                 isClosed: false, config: {},
-                 devices: {}};
+        return  {sensorValue: null, isClosed: false};
     } else {
         switch(action.type) {
         case AppConstants.APP_UPDATE:

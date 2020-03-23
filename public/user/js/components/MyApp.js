@@ -1,12 +1,9 @@
 var React = require('react');
 var rB = require('react-bootstrap');
 var cE = React.createElement;
-var SelectService = require('./SelectService');
-var SelectDevices = require('./SelectDevices');
 var Device = require('./Device');
 var AppStatus = require('./AppStatus');
 var DisplayError = require('./DisplayError');
-var DisplayURL = require('./DisplayURL');
 var url = require('url');
 
 var MyApp = {
@@ -45,10 +42,6 @@ var MyApp = {
                       ctx: this.props.ctx,
                       error: this.state.error
                   }),
-                  cE(DisplayURL, {
-                      ctx: this.props.ctx,
-                      newURL: this.state.newURL
-                  }),
                   cE(rB.Panel, {
                       header: cE(rB.Grid, {fluid: true},
                                  cE(rB.Row, null,
@@ -69,17 +62,6 @@ var MyApp = {
                                    )
                                 )
                   },
-                     cE(rB.Panel, {header: "Select Service"},
-                        cE(SelectService, {
-                            ctx: this.props.ctx,
-                            config: this.state.config
-                        })),
-                     cE(rB.Panel, {header: "Click to Connect Device"},
-                        cE(SelectDevices, {
-                            ctx: this.props.ctx,
-                            devices: this.state.devices,
-                            selectedDevice: this.state.selectedDevice
-                        })),
                      (this.state.selectedDevice ?
                       cE(rB.Panel, {header: "Bluetooth Device"},
                          cE(Device, {

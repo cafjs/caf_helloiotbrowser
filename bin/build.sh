@@ -7,6 +7,15 @@ export NODE_ENV=production
 browserify public/js/main.js | uglifyjs > public/js/build.min.js
 unset NODE_ENV
 
+#build user view
+echo "browserify  -d public/user/js/main.js -o public/user/js/build.js"
+browserify  -d public/user/js/main.js -o public/user/js/build.js
+echo "browserify public/user/js/main.js | uglifyjs > public/user/js/build.min.js"
+export NODE_ENV=production
+browserify public/user/js/main.js | uglifyjs > public/user/js/build.min.js
+unset NODE_ENV
+
+
 #build iot
 pushd iot
 cafjs pack true . ./app.tgz &&  mv ./app.tgz ../public/iot.tgz

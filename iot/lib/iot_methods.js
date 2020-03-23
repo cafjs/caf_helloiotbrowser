@@ -69,6 +69,8 @@ exports.methods = {
                                          '__iot_foundService__');
                 this.removeEventListener('click', handler);
                 button.style = 'display:none;';
+                const message = document.getElementById('afterConfirmScan');
+                message.style = 'display:inline;';
                 cb(null);
             });
         } else {
@@ -103,45 +105,63 @@ exports.methods = {
         return [];
     },
 
-    async selectDevice(deviceId) {
+    selectDevice(deviceId, cb) {
+        const self = this;
+
         this.$.log && this.$.log.debug('Selected device ' + deviceId);
         this.state.selectedDevice = deviceId;
+
         if (this.scratch.devices[deviceId]) {
+            const compare = function(x, y) {
+                if (x.length < y.length) {
+                    return compare(y, x);
+                } else {
+                    const xL = x.toLowerCase();
+                    const yL = y.toLowerCase();
+                    return ((xL === yL) ||
+                            (xL === '0000' + yL + '00001000800000805f9b34fb'));
+                }
+            };
+
+            const __iot_foundCharact__ = function(service, device, chArray) {
+                chArray = chArray || [];
+                self.$.log && self.$.log.debug('Found characteristics ' +
+                                               chArray);
+                self.$.log && self.$.log.debug(
+                    'Target characteristics blink:' + self.state.config.blink +
+                    ' notify:' + self.state.config.notify
+                );
+                chArray.forEach(function(x) {
+                    if (compare(x.uuid, self.state.config.blink)) {
+                        self.scratch.blinkCharact = x;
+                    } else if (compare(x.uuid, self.state.config.notify)) {
+                        self.scratch.notifyCharact = x;
+                        self.$.gatt.subscribe(x, '__iot_subscribe__');
+                    } else {
+                        self.$.log && self.$.log.debug('Ignoring charact ' +
+                                                       x.uuid);
+                    }
+                });
+            };
+
+            const handleChF = function(err, data) {
+                if (err) {
+                    cb(err);
+                } else {
+                    const {service, device, characteristics} = data;
+                    __iot_foundCharact__(service, device, characteristics);
+                    cb(null);
+                }
+            };
+
             this.$.gatt.findCharacteristics(this.state.config.service,
                                             this.scratch.devices[deviceId],
-                                            '__iot_foundCharact__');
+                                            handleChF);
         } else {
             this.$.log && this.$.log.debug('select: Ignoring unknown device ' +
                                            deviceId);
+            cb(null);
         }
-        return [];
-    },
-
-    async __iot_foundCharact__(service, device, chArray) {
-        var compare = function(x, y) {
-            if (x.length < y.length) {
-                return compare(y, x);
-            } else {
-                return ((x === y) ||
-                        (x === '0000' + y + '00001000800000805f9b34fb'));
-            }
-        };
-        var self = this;
-        chArray = chArray || [];
-        this.$.log && this.$.log.debug('Found characteristics ' +
-                                       chArray);
-        chArray.forEach(function(x) {
-            if (compare(x.uuid, self.state.config.blink)) {
-                self.scratch.blinkCharact = x;
-            } else if (compare(x.uuid, self.state.config.notify)) {
-                self.scratch.notifyCharact = x;
-                self.$.gatt.subscribe(x, '__iot_subscribe__');
-            } else {
-                self.$.log && self.$.log.debug('Ignoring characteristic ' +
-                                               x.uuid);
-            }
-        });
-        return [];
     },
 
     async __iot_subscribe__(charact, value) {

@@ -2,6 +2,7 @@ var React = require('react');
 var rB = require('react-bootstrap');
 var cE = React.createElement;
 var AppActions = require('../actions/AppActions');
+var urlParser = require('url');
 
 var SelectDevices = {
 
@@ -9,6 +10,14 @@ var SelectDevices = {
     selectedDeviceIndex: null,
 
     handleSelect: function(selectedKey) {
+        if (window && window.location && window.location.href) {
+            var myURL = urlParser.parse(window.location.href);
+            myURL.pathname = '/user/index.html';
+            myURL.hash = myURL.hash.replace('session=default', 'session=user');
+            delete myURL.search; // delete cacheKey
+            const newURL = urlParser.format(myURL);
+            AppActions.setLocalState(this.props.ctx, {newURL: newURL});
+        }
         AppActions.selectDevice(this.props.ctx, this.indexToId[selectedKey]);
     },
 

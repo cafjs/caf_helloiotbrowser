@@ -73,8 +73,7 @@ var AppActions = {
     }
 };
 
-['findServices', 'selectDevice', 'blink', 'getState', 'stop', 'setConfig',
- 'disconnect'].forEach(function(x) {
+[ 'blink', 'getState', 'stop'].forEach(function(x) {
      AppActions[x] = async function() {
          var args = Array.prototype.slice.call(arguments);
          try {
