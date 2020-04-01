@@ -1,11 +1,10 @@
-# CAF (Cloud Assistant Framework)
+# Caf.js
 
-Co-design permanent, active, stateful, reliable cloud proxies with your web app.
+Co-design permanent, active, stateful, reliable cloud proxies with your web app and gadgets.
 
-See http://www.cafjs.com 
+See https://www.cafjs.com
 
-## CAF IoT example using a React.js front end  
+## Browser-based IoT Example
 
-Basic example combining a CA, an IoT device application, and a React+Flux 
-front end.
-
+Basic example combining a CA, an IoT device application, and a React+Flux
+front end. The device application can also run in the browser using the Web Bluetooth API (Chrome).
