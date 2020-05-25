@@ -17,7 +17,7 @@ limitations under the License.
 
 'use strict';
 
-var myUtils = require('caf_iot').caf_components.myUtils;
+const myUtils = require('caf_iot').caf_components.myUtils;
 
 exports.methods = {
     async __iot_setup__() {
@@ -34,7 +34,7 @@ exports.methods = {
                                         this.$.cloud.cli
                                         .getEstimatedTimeOffset()));
         this.state.index = this.state.index + 1;
-        var now = (new Date()).getTime();
+        const now = (new Date()).getTime();
         this.$.log && this.$.log.debug(now + ' loop:' + this.state.index);
 
         if (!myUtils.deepEqual(this.toCloud.get('devices'),
@@ -48,45 +48,28 @@ exports.methods = {
         return [];
     },
 
-    findServices(config, cb) {
-        var self = this;
-        var now = (new Date()).getTime();
+    async findServices(config) {
+        const now = (new Date()).getTime();
         this.$.log && this.$.log.debug(now + ' config:' +
                                        JSON.stringify(config));
         this.state.config = config;
         if (typeof window !== 'undefined') {
-            /* A button with id 'confirmScan' by convention that is only
-             visible when input is needed to bypass Web BT security check.
-             For example:
-             <button id="confirmScan" style= "display:none;">
-                      Click to allow Bluetooth scan</button>
-             */
-
-            var button = document.getElementById('confirmScan');
-            button.style = 'display:inline;';
-            button.addEventListener('click', function handler() {
-
-                self.$.gatt.findServices(config.service,
-                                         '__iot_foundService__');
-                this.removeEventListener('click', handler);
-                button.style = 'display:none;';
-                const message = document.getElementById('afterConfirmScan');
-                message.style = 'display:inline;';
-                cb(null);
-            });
+            // Wait for user click
+            await this.$.gatt.findServicesWeb(
+                config.service, '__iot_foundService__', 'confirmScan',
+                'afterConfirmScan'
+            );
         } else {
             this.$.gatt.findServices(config.service, '__iot_foundService__');
-            cb(null);
         }
-
+        return [];
     },
 
     async __iot_foundService__(serviceId, device) {
-        var self = this;
-        var filterF = function() {
-            var all = self.scratch.devices || {};
-            var result = {};
-            Object.keys(all).forEach(function(x) {
+        const filterF = () => {
+            const all = this.scratch.devices || {};
+            const result = {};
+            Object.keys(all).forEach((x) => {
                 result[x] = {
                     uuid: all[x].uuid,
                     advertisement: myUtils.deepClone(all[x].advertisement)
@@ -106,62 +89,48 @@ exports.methods = {
         return [];
     },
 
-    selectDevice(deviceId, cb) {
-        const self = this;
-
+    async selectDevice(deviceId) {
         this.$.log && this.$.log.debug('Selected device ' + deviceId);
         this.state.selectedDevice = deviceId;
 
         if (this.scratch.devices[deviceId]) {
-            const compare = function(x, y) {
-                if (x.length < y.length) {
-                    return compare(y, x);
-                } else {
-                    const xL = x.toLowerCase();
-                    const yL = y.toLowerCase();
-                    return ((xL === yL) ||
-                            (xL === '0000' + yL + '00001000800000805f9b34fb'));
-                }
-            };
-
-            const __iot_foundCharact__ = function(service, device, chArray) {
+            const processCharact = (service, device, chArray) => {
+                const compare =  this.$.gatt.compareId;
                 chArray = chArray || [];
-                self.$.log && self.$.log.debug('Found characteristics ' +
+                this.$.log && this.$.log.debug('Found characteristics ' +
                                                chArray);
-                self.$.log && self.$.log.debug(
-                    'Target characteristics blink:' + self.state.config.blink +
-                    ' notify:' + self.state.config.notify
+                this.$.log && this.$.log.debug(
+                    'Target characteristics blink:' + this.state.config.blink +
+                    ' notify:' + this.state.config.notify
                 );
-                chArray.forEach(function(x) {
-                    if (compare(x.uuid, self.state.config.blink)) {
-                        self.scratch.blinkCharact = x;
-                    } else if (compare(x.uuid, self.state.config.notify)) {
-                        self.scratch.notifyCharact = x;
-                        self.$.gatt.subscribe(x, '__iot_subscribe__');
+                chArray.forEach((x) => {
+                    if (compare(x.uuid, this.state.config.blink)) {
+                        this.scratch.blinkCharact = x;
+                    } else if (compare(x.uuid, this.state.config.notify)) {
+                        this.scratch.notifyCharact = x;
+                        this.$.gatt.subscribe(x, '__iot_subscribe__');
                     } else {
-                        self.$.log && self.$.log.debug('Ignoring charact ' +
+                        this.$.log && this.$.log.debug('Ignoring charact ' +
                                                        x.uuid);
                     }
                 });
             };
 
-            const handleChF = function(err, data) {
-                if (err) {
-                    cb(err);
-                } else {
-                    const {service, device, characteristics} = data;
-                    __iot_foundCharact__(service, device, characteristics);
-                    cb(null);
-                }
-            };
-
-            this.$.gatt.findCharacteristics(this.state.config.service,
-                                            this.scratch.devices[deviceId],
-                                            handleChF);
+            try {
+                const {service, device, characteristics} =
+                          await this.$.gatt.findCharacteristics(
+                              this.state.config.service,
+                              this.scratch.devices[deviceId]
+                          );
+                processCharact(service, device, characteristics);
+                return [];
+            } catch (err) {
+                return [err];
+            }
         } else {
             this.$.log && this.$.log.debug('select: Ignoring unknown device ' +
                                            deviceId);
-            cb(null);
+            return [];
         }
     },
 
@@ -173,19 +142,19 @@ exports.methods = {
     },
 
     async blink() {
-        var buf = new Buffer('on');
         if (this.scratch.blinkCharact) {
+            const buf = new Buffer('on');
             this.$.log && this.$.log.debug('Blinking');
-            this.$.gatt.write(this.scratch.blinkCharact, buf);
+            await this.$.gatt.write(this.scratch.blinkCharact, buf);
         }
         return [];
     },
 
     async stop() {
-        var buf = new Buffer('off');
         if (this.scratch.blinkCharact) {
+            const buf = new Buffer('off');
             this.$.log && this.$.log.debug('Stop advertising');
-            this.$.gatt.write(this.scratch.blinkCharact, buf);
+            await this.$.gatt.write(this.scratch.blinkCharact, buf);
         }
         return [];
     },
@@ -194,10 +163,10 @@ exports.methods = {
         if (this.scratch.notifyCharact) {
             this.$.gatt.unsubscribe(this.scratch.notifyCharact);
         }
-        var device = this.state.selectedDevice &&
+        const device = this.state.selectedDevice &&
                 this.scratch.devices[this.state.selectedDevice];
         if (device) {
-            this.$.gatt.disconnect(device);
+            await this.$.gatt.disconnect(device);
         }
         return [];
     }
